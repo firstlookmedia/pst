@@ -1,5 +1,6 @@
 (ns pst.folder
-  (:require [pst.message :as message]))
+  (:import [com.pff PSTFile])
+  (:require [pst.message :as pm]))
 
 (defrecord Folder
     [display-name
@@ -8,8 +9,8 @@
      java-object])
 
 (defn folder
-  "Given a com.pff.PSTFolder, return a nice clojure record"
-  [f]
+  "Given a com.pff.PSTFolder, return a Folder record."
+  [^com.pff.PSTFolder f]
   (->Folder (.getDisplayName    f)
             (.getContentCount   f)
             (.getSubFolderCount f)
@@ -22,17 +23,16 @@
                     ;; last message, which works for our lazy-seq
                     ;; below
                     (.getNextChild      (:java-object f))))
-                          
+
 (defn messages
-  "Given a folder, return a lazy seq of messages"
+  "Given a folder, return a lazy seq of Messages."
   ([^Folder f]   (messages f 0))
   ([^Folder f n] (let [current-message (nth-message f n)]
                    (if (nil? current-message)
                      nil
-                     (lazy-seq (cons (message/message current-message)
+                     (lazy-seq (cons (pm/message current-message)
                                      (messages f (inc n))))))))
 
 (defn subfolders
-  "Given a folder, return a seq of subfolders"
+  "Given a folder, return a seq of subfolders."
   [^Folder f] (map folder (.getSubFolders (:java-object f))))
-  

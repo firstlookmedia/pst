@@ -1,9 +1,9 @@
 (ns pst.core-test
   (:require [clojure.test :refer :all]
-            [pst.core :as pst]
-            [pst.folder        :as pf]))
+            [pst.archive :as pa]
+            [pst.folder  :as pf]))
 
-(def archive (pst/pst-archive "test/resources/sample1.pst"))
+(def archive (pa/archive "test/resources/sample1.pst"))
 
 (deftest message-store-test
   (testing "Message store display name"
@@ -29,12 +29,12 @@
              (map vector
                   (map :display-name outlook)
                   (map :message-count outlook)))))))
-  
+
 (deftest message-test
   (let [subs    (pf/subfolders (:root-folder archive))
         outlook (pf/subfolders (first subs))
         sample  (second outlook)
-        sample-message (first (pf/messages sample))]    
+        sample-message (first (pf/messages sample))]
       (is (= (:is-read sample-message) true))
       (is (= (:subject sample-message) "Here is a sample message"))
       (is (= (:conversation-topic sample-message) "Here is a sample message"))
@@ -46,7 +46,3 @@
       (is (= (:sender-name sample-message)
              "Terry Mahaffey"))
       (is (= (:attachment-count sample-message) 1))))
-          
-    
-
-    

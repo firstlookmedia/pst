@@ -1,45 +1,10 @@
 (ns pst.core
-  (:import [com.pff PSTFile]
-           [java.io File InputStream
-            ByteArrayInputStream])
-  (:require [pst.message       :as message]
+  (:require [pst.message       :as pm]
             [pst.message-store :as ms]
             [pst.folder        :as pf]
-            [clojure.java.io :refer [input-stream copy]]))
+            [pst.archive       :as pa]))
+            ;; [clojure.java.io :refer [input-stream copy]]))
 
-;; (defn pst-file [path]
-;;   (PSTFile. path))
-;; (defn root-folder [m]
-;;   (.getRootFolder m))
-
-;; (defn display-name [folder]
-;;   (.getDisplayName folder))
-
-;; (defn content-count [folder]
-;;   (.getContentCount folder))
-
-;; (defn has-subfolders [folder]
-;;   (.hasSubfolders folder))
-
-;; (defn subfolders [folder]
-;;   (.getSubFolders folder))
-
-;; (defmacro obj->map [o & bindings]
-;;   (let [s (gensym "local")]
-;;     `(let [~s ~o]
-;;        ~(->> (partition 2 bindings)
-;;              (map (fn [[k v]]
-;;                     (if (vector? v)
-;;                       [k (list (last v) (list (first v) s))]
-;;                       [k (list v s)])))
-;;              (into {})))))
-
-
-;; (defn messages
-;;   "Return a lazy seq of the messages in a folder."
-;;   [folder]
-;;   (lazy-seq (cons (.getNextChild folder) (messages folder))))
-   
 
 ;; (defn process-folder [folder]
 ;;   (prn (str "Folder: "          (display-name folder)
@@ -51,20 +16,17 @@
 ;;       (doseq [subf (subfolders folder)]
 ;;         (process-folder subf)))))
 
-(defprotocol FileOps
-  (pst-file [input] "Return a file record"))
+;; (defrecord PSTArchive
+;;     [message-store root-folder encryption-type pst-file-type])
 
-(defrecord PSTArchive
-    [message-store root-folder encryption-type pst-file-type])
+;; (defn pst-archive [filename]
+;;   (let [pst (PSTFile. filename)]
+;;     (->PSTArchive (ms/message-store (.getMessageStore   pst))
+;;                   (pf/folder        (.getRootFolder     pst))
+;;                   (.getEncryptionType pst)
+;;                   (.getFileHandle     pst))))
 
-(defn pst-archive [filename]
-  (let [pst (PSTFile. filename)]
-    (->PSTArchive (ms/message-store (.getMessageStore   pst))                  
-                  (pf/folder        (.getRootFolder     pst))
-                  (.getEncryptionType pst)
-                  (.getFileHandle     pst))))
-        
-(def archive (pst-archive "test/resources/sample1.pst"))
+(def archive (pa/archive "test/resources/sample1.pst"))
 ;; "sample1"
 (:display-name (:message-store archive))
 ;; 0
@@ -105,3 +67,4 @@
 (:sender-email-address sample-message)
 (:sender-name sample-message)
 
+(:internet-article-number sample-message)
