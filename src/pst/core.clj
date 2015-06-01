@@ -9,47 +9,47 @@
 
 ;; (defn pst-file [path]
 ;;   (PSTFile. path))
-(defn root-folder [m]
-  (.getRootFolder m))
+;; (defn root-folder [m]
+;;   (.getRootFolder m))
 
-(defn display-name [folder]
-  (.getDisplayName folder))
+;; (defn display-name [folder]
+;;   (.getDisplayName folder))
 
-(defn content-count [folder]
-  (.getContentCount folder))
+;; (defn content-count [folder]
+;;   (.getContentCount folder))
 
-(defn has-subfolders [folder]
-  (.hasSubfolders folder))
+;; (defn has-subfolders [folder]
+;;   (.hasSubfolders folder))
 
-(defn subfolders [folder]
-  (.getSubFolders folder))
+;; (defn subfolders [folder]
+;;   (.getSubFolders folder))
 
-(defmacro obj->map [o & bindings]
-  (let [s (gensym "local")]
-    `(let [~s ~o]
-       ~(->> (partition 2 bindings)
-             (map (fn [[k v]]
-                    (if (vector? v)
-                      [k (list (last v) (list (first v) s))]
-                      [k (list v s)])))
-             (into {})))))
+;; (defmacro obj->map [o & bindings]
+;;   (let [s (gensym "local")]
+;;     `(let [~s ~o]
+;;        ~(->> (partition 2 bindings)
+;;              (map (fn [[k v]]
+;;                     (if (vector? v)
+;;                       [k (list (last v) (list (first v) s))]
+;;                       [k (list v s)])))
+;;              (into {})))))
 
 
-(defn messages
-  "Return a lazy seq of the messages in a folder."
-  [folder]
-  (lazy-seq (cons (.getNextChild folder) (messages folder))))
+;; (defn messages
+;;   "Return a lazy seq of the messages in a folder."
+;;   [folder]
+;;   (lazy-seq (cons (.getNextChild folder) (messages folder))))
    
 
-(defn process-folder [folder]
-  (prn (str "Folder: "          (display-name folder)
-            ", content count: " (content-count folder)))
-  (do
-    (doall (map #(prn (str "Subject: " (message/subject %)))
-                (take-while some? (messages folder))))
-    (if (has-subfolders folder)
-      (doseq [subf (subfolders folder)]
-        (process-folder subf)))))
+;; (defn process-folder [folder]
+;;   (prn (str "Folder: "          (display-name folder)
+;;             ", content count: " (content-count folder)))
+;;   (do
+;;     (doall (map #(prn (str "Subject: " (message/subject %)))
+;;                 (take-while some? (messages folder))))
+;;     (if (has-subfolders folder)
+;;       (doseq [subf (subfolders folder)]
+;;         (process-folder subf)))))
 
 (defprotocol FileOps
   (pst-file [input] "Return a file record"))
@@ -101,4 +101,7 @@
 (:is-from-me sample-message)
 ;; 1
 (:attachment-count sample-message)
+(:rfc-message-id sample-message)
+(:sender-email-address sample-message)
+(:sender-name sample-message)
 
