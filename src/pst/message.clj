@@ -1,24 +1,16 @@
-(ns pst.message)
+(ns pst.message
+  (require [pst.util :as pu]
+           [pst.attachment :as pat]))
 
 (defn subject [m]
   (.getSubject m))
 
 (defrecord Message [java-object])
 
-(defmacro obj->map [o & bindings]
-  (let [s (gensym "local")]
-    `(let [~s ~o]
-       ~(->> (partition 2 bindings)
-             (map (fn [[k v]]
-                    (if (vector? v)
-                      [k (list (last v) (list (first v) s))]
-                      [k (list v s)])))
-             (into {})))))
-
 (defn message [m]
   (merge
    (->Message m)
-   (obj->map m
+   (pu/obj->map m
              :rtf-body                                 .getRTFBody
              :importance                               .getImportance
              :message-class                            .getMessageClass
@@ -140,6 +132,22 @@
              :recipients-string                        .getRecipientsString
              ;; should also wrap getRecipient, to produce a seq of contacts
              )))
-
-
 ;;             :conversation-id .getConversationId))) ;; too new
+
+(defn nth-attachment
+  "Given a message and an attachment index, return that attachment from the message. Return nil if the index is out of range"
+  [m n] (if (> n (- (:attachment-count m) 1))
+          nil
+          (.getAttachment (:java-object m) n)))
+
+(defn attachments
+  "Given a message, return a lazy seq of its Attachments"
+  ([^Message m]   (attachments m 0))
+  ([^Message m n] (let [current-attachment (nth-attachment m n)]
+                    (if (nil? current-attachment)
+                      nil
+                      ;; (lazy-seq (cons current-attachment
+                      ;;                 (attachments m (inc n))))))))
+
+                      (lazy-seq (cons (pat/attachment current-attachment)
+                                      (attachments m (inc n))))))))

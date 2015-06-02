@@ -2,7 +2,8 @@
   (:require [pst.message       :as pm]
             [pst.message-store :as ms]
             [pst.folder        :as pf]
-            [pst.archive       :as pa]))
+            [pst.archive       :as pa]
+            [pst.attachment    :as pat]))
             ;; [clojure.java.io :refer [input-stream copy]]))
 
 
@@ -68,3 +69,4 @@
 (:sender-name sample-message)
 
 (:internet-article-number sample-message)
+(pat/save (first (pm/attachments sample-message)) "/home/joshua/uh.jpg")
