@@ -48,7 +48,7 @@ More example usage:
 (:subject sample-message)   ;; "Here is a sample message"
 
 (:attachment-count sample-message) ;; -> 1
-(pat/save (first (pm/attachments sample-message)) "/home/joshua/uh.jpg")
+(pat/save (first (pm/attachments sample-message)) "~/sample.jpg")
 
 (def sample-recipient (first (pm/recipients sample-message)))
 (:smtp-address sample-recipient) ;; -> "terrymah@microsoft.com"
