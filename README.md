@@ -1,6 +1,6 @@
 # pst
 
-A little library which wraps [java-libpst](https://github.com/rjohnsondev/java-libpst) - provides a read-only interface to ["PFF"](http://forensicswiki.org/wiki/Personal_Folder_File_(PAB,_PST,_OST)) files. 
+A little library which wraps [java-libpst](https://github.com/rjohnsondev/java-libpst) - provides a read-only interface to ["PFF"](http://forensicswiki.org/wiki/Personal_Folder_File_%28PAB,_PST,_OST%29) files. 
 
 ## Usage
 
