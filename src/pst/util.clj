@@ -1,5 +1,8 @@
 (ns pst.util)
 
+(defprotocol PSTMessage
+  (to-dict [m]))
+
 (defmacro obj->map [o & bindings]
   (let [s (gensym "local")]
     `(let [~s ~o]

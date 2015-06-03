@@ -3,7 +3,10 @@
            [pst.attachment :as pat]
            [pst.recipient :as pr]))
 
-(defrecord Message [java-object])
+
+(defrecord Message [java-object]
+  pu/PSTMessage
+  (to-dict [this] (dissoc this :java-object)))
 
 (defn message [m]
   (merge
@@ -22,7 +25,7 @@
              :sent-representing-email-address          .getSentRepresentingEmailAddress
 
              ;; "This is basically the subject from which Fwd:, Re,
-             ;; etc                                    . has been removed"
+             ;; etc has been removed"
              :conversation-topic                       .getConversationTopic
 
              :transport-message-headers                .getTransportMessageHeaders
@@ -88,7 +91,6 @@
              :message-delivery-time                    .getMessageDeliveryTime
 
              ;; content
-             ;; :body-type                             .getNativeBodyType ;; too new!
              :body                                     .getBody ;; plain text
              :body-prefix                              .getBodyPrefix ;; plain text body prefix
              :rtf-body-crc                             .getRTFSyncBodyCRC
@@ -128,9 +130,11 @@
 
              ;; recip
              :recipients-string                        .getRecipientsString
-             ;; should also wrap getRecipient, to produce a seq of contacts
              )))
-;;             :conversation-id .getConversationId))) ;; too new
+
+;; these exist in libpst in git, but not in a tagged release.
+;;           :body-type       .getNativeBodyType
+;;           :conversation-id .getConversationId
 
 (defn nth-attachment
   "Given a message and an attachment index, return that attachment

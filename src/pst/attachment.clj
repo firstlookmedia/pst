@@ -2,7 +2,9 @@
   (:require [pst.util :as pu]
             [clojure.java.io :refer [copy output-stream]]))
 
-(defrecord Attachment [java-object])
+(defrecord Attachment [java-object]
+  pu/PSTMessage
+  (to-dict [this] (dissoc this :java-object)))
 
 (defn attachment [a]
   (merge

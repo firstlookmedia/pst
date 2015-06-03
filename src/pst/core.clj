@@ -4,44 +4,52 @@
             [pst.folder        :as pf]
             [pst.archive       :as pa]
             [pst.attachment    :as pat]
-            [pst.recipient     :as pr]))
+            [pst.recipient     :as pr]
+            [pst.util          :as pu]
+            [clojure.pprint    :as pprint]))
 
+(defn- pad
+  ([d] (pad d " "))
+  ([d c]
+   (apply str (repeat d c))))
 
-(defn process-message [m depth]
+(defn process-message [m depth noisy]
   (do
-    (prn (str (apply str (repeat (inc depth) " ")) "  Subject:        " (:subject m)))
-    (prn (str (apply str (repeat (inc depth) " ")) "  Class:        " (:message-class m)))
+    (println (str (pad (inc depth)) "  Subject:        " (:subject m)))
+    (println (str (pad (inc depth)) "  Class:        " (:message-class m)))
     (case (:message-class m)
-      "IPM.Contact"  (prn (str (apply str (repeat (inc depth) " " )) "  Contact: "
+      "IPM.Contact"  (println (str (apply str (repeat (inc depth) " " )) "  Contact: "
                                (:given-name m) " "
                                (:surname m) " "
                                (:smtp-address m)))
       "IPM.Appointment" (do
-                          (prn (str (apply str (repeat (inc depth) " " )) "  Start: " (:start-time m)))
-                          (prn (str (apply str (repeat (inc depth) " " )) "  Location: " (:location m)))
-                          (prn (str (apply str (repeat (inc depth) " " )) "  Attendees: " (:all-attendees m))))
-      nil)))
+                          (println (str (pad (inc depth)) "  Start: " (:start-time m)))
+                          (println (str (pad (inc depth)) "  Location: " (:location m)))
+                          (println (str (pad (inc depth)) "  Attendees: " (:all-attendees m))))
+      (if noisy (pprint/pprint (pu/to-dict m))))
+
+    nil))
 
 
 (defn process-folder
-  ([f] (process-folder f 0))
-  ([f depth]
+  ([f noisy] (process-folder f 0 noisy))
+  ([f depth noisy]
    (do
-     (prn (str (apply str (repeat (inc depth) "*")) " Folder:        " (:display-name f)))
-     (prn (str (apply str (repeat (inc depth) " ")) " Message Count: " (:message-count f)))
-     ;; (prn (str (apply str (repeat (inc depth) " ")) " Subfolder Count: " (:subfolder-count f)))
-     (doall (map (fn [m] (process-message m depth)) (pf/messages f)))
-     (doall (map (fn [ff] (process-folder ff (inc depth))) (pf/subfolders f))))))
+     (println (str (pad (inc depth) "*") " Folder:        " (:display-name f)))
+     (println (str (pad (inc depth) " ") " Message Count: " (:message-count f)))
+     (doall (map (fn [m] (process-message m depth noisy)) (pf/messages f)))
+     (doall (map (fn [ff] (process-folder ff (inc depth) noisy)) (pf/subfolders f))))))
 
-(defn process-archive [a]
+(defn process-archive [a noisy]
   (let [store       (:message-store a)
         store-name  (:display-name store)
         root-folder (:root-folder a)]
     (do
-      (prn (str "Message store: " store-name))
-      (process-folder root-folder))))
+      (println (str "Message store: " store-name))
+      (process-folder root-folder noisy))))
 
 (defn -main [& args]
-  (do (prn "PST demo using " (first args))
-      (let [archive (pa/archive (first args))]
-        (process-archive archive))))
+  (do (println "PST demo using " (first args))
+      (let [archive (pa/archive (first args))
+            noisy   (second args)]
+        (process-archive archive noisy))))

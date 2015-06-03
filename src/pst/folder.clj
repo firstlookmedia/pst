@@ -20,7 +20,7 @@
 
 (defn nth-message
   "Get the nth message from a folder. Returns one of a Message,
-  Contact, or Activity record."
+  Contact, or Appointment record."
   [^Folder f n] (let [_         (.moveChildCursorTo        (:java-object f) n)
                       child-obj (.getNextChild (:java-object f))
                       child     (if (nil? child-obj)
@@ -28,13 +28,16 @@
                                   (pm/message child-obj))]
                       (case (:message-class child)
                         nil               nil
+                        ;; this would be cleaner as a protocol implemented
+                        ;; on com.PFF.[PSTContact,PSTAppointment,PSTMessage]
                         "IPM.Note"        child
                         "IPM.Contact"     (pcon/contact child)
                         "IPM.Appointment" (papp/appointment child)
                         child))) ;; better handle this...
 
 (defn messages
-  "Given a folder, return a lazy seq of Messages."
+  "Given a folder, return a lazy seq of Messages, Contacts, and/or
+  Appointments"
   ([^Folder f]   (messages f 0))
   ([^Folder f n] (let [current-message (nth-message f n)]
                    (if (nil? current-message)

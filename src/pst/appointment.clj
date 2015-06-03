@@ -1,7 +1,10 @@
 (ns pst.appointment
   (require [pst.util :as pu]))
 
-(defrecord Appointment [])
+(defrecord Appointment []
+  pu/PSTMessage
+  (to-dict [this] (dissoc this :java-object)))
+
 (defn appointment [a]
   (merge
    (->Appointment)
@@ -46,5 +49,7 @@
                 :is-slient                         .isSilent
                 :required-attendees                .getRequiredAttendees
                 :locale-id                         .getLocaleId)))
+
+                ;; these are in git, but not in a tagged release of libpst
                 ;; :global-object-id                  .getGlobalObjectId
-                ;; :clean-global-object-id            .getCleanGlobalObjectId))) ;; too new...
+                ;; :clean-global-object-id            .getCleanGlobalObjectId)))

@@ -1,7 +1,8 @@
 (ns pst.core-test
   (:require [clojure.test :refer :all]
             [pst.archive :as pa]
-            [pst.folder  :as pf]))
+            [pst.folder  :as pf]
+            [pst.message :as pm]))
 
 (def archive (pa/archive "test/resources/sample1.pst"))
 
@@ -46,3 +47,11 @@
       (is (= (:sender-name sample-message)
              "Terry Mahaffey"))
       (is (= (:attachment-count sample-message) 1))))
+
+(deftest attachment-test
+  (let [subs    (pf/subfolders (:root-folder archive))
+        outlook (pf/subfolders (first subs))
+        sample  (second outlook)
+        sample-message (first (pf/messages sample))
+        attachment (first (pm/attachments sample-message))]
+    (is (= (:long-filename attachment) "leah_thumper.jpg"))))
