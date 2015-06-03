@@ -5,4 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [com.pff/java-libpst "0.8.1"]]
-  :main pst.core)
+  :main pst.core
+  :signing {:gpg-key "DC284680"})
