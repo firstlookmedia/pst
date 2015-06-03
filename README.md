@@ -56,6 +56,12 @@ More example usage:
 
 Contacts, appointments, messages, and attachments are supported. See `pst.core`.
 
+## Latest Release
+
+Via Clojars:
+
+    [firstlook/pst 0.1.0]
+
 ## License
 
 Copyright © 2015 Joshua Thayer <joshua@firstlook.org>

@@ -1,4 +1,4 @@
-(defproject pst "0.1.0"
+(defproject firstlook/pst "0.1.0"
   :description "Processes MS Exchange archives."
   :url "https://github.com/firstlook/pst"
   :license {:name "Eclipse Public License"
