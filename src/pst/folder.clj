@@ -1,6 +1,8 @@
 (ns pst.folder
   (:import [com.pff PSTFile])
-  (:require [pst.message :as pm]))
+  (:require [pst.message :as pm]
+            [pst.contact :as pcon]
+            [pst.appointment :as papp]))
 
 (defrecord Folder
     [display-name
@@ -17,12 +19,19 @@
             f))
 
 (defn nth-message
-  [^Folder f n] (do (.moveChildCursorTo (:java-object f) n)
-
-                    ;; this will return nil if n is beyond the
-                    ;; last message, which works for our lazy-seq
-                    ;; below
-                    (.getNextChild      (:java-object f))))
+  "Get the nth message from a folder. Returns one of a Message,
+  Contact, or Activity record."
+  [^Folder f n] (let [_         (.moveChildCursorTo        (:java-object f) n)
+                      child-obj (.getNextChild (:java-object f))
+                      child     (if (nil? child-obj)
+                                  nil
+                                  (pm/message child-obj))]
+                      (case (:message-class child)
+                        nil               nil
+                        "IPM.Note"        child
+                        "IPM.Contact"     (pcon/contact child)
+                        "IPM.Appointment" (papp/appointment child)
+                        child))) ;; better handle this...
 
 (defn messages
   "Given a folder, return a lazy seq of Messages."
@@ -30,7 +39,7 @@
   ([^Folder f n] (let [current-message (nth-message f n)]
                    (if (nil? current-message)
                      nil
-                     (lazy-seq (cons (pm/message current-message)
+                     (lazy-seq (cons current-message
                                      (messages f (inc n))))))))
 
 (defn subfolders

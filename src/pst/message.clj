@@ -1,9 +1,7 @@
 (ns pst.message
   (require [pst.util :as pu]
-           [pst.attachment :as pat]))
-
-(defn subject [m]
-  (.getSubject m))
+           [pst.attachment :as pat]
+           [pst.recipient :as pr]))
 
 (defrecord Message [java-object])
 
@@ -135,7 +133,8 @@
 ;;             :conversation-id .getConversationId))) ;; too new
 
 (defn nth-attachment
-  "Given a message and an attachment index, return that attachment from the message. Return nil if the index is out of range"
+  "Given a message and an attachment index, return that attachment
+  from the message. Return nil if the index is out of range"
   [m n] (if (> n (- (:attachment-count m) 1))
           nil
           (.getAttachment (:java-object m) n)))
@@ -146,8 +145,19 @@
   ([^Message m n] (let [current-attachment (nth-attachment m n)]
                     (if (nil? current-attachment)
                       nil
-                      ;; (lazy-seq (cons current-attachment
-                      ;;                 (attachments m (inc n))))))))
-
                       (lazy-seq (cons (pat/attachment current-attachment)
                                       (attachments m (inc n))))))))
+
+(defn nth-recipient
+  [m n] (if (> n (- (:number-of-recipients m) 1))
+          nil
+          (.getRecipient (:java-object m) n)))
+
+(defn recipients
+  "Given a message, return a lazy seq of its Recipients"
+  ([^Message m] (recipients m 0))
+  ([^Message m n] (let [current-recipient (nth-recipient m n)]
+                    (if (nil? current-recipient)
+                      nil
+                      (lazy-seq (cons (pr/recipient current-recipient)
+                                      (recipients m (inc n))))))))
