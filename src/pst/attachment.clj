@@ -34,5 +34,5 @@
 (defn save
   "Given an attachment and a filename, save attached file contents to disk."
   [a fn]
-  (with-open [out (output-stream file)]
+  (with-open [out (output-stream fn)]
     (copy (.getFileInputStream (:java-object a)) out)))
